@@ -495,3 +495,66 @@ table.t{width:100%;border-collapse:collapse;min-width:640px}
   .t.cards tr.late{box-shadow:inset 3px 0 0 var(--bad)}
   .t.cards tr.late td:first-child{box-shadow:none}
 }
+
+/* ---------- acabamento mobile ---------- */
+@media (max-width:860px){
+  /* iPhone dá zoom em campo com fonte < 16px */
+  .f input,.f select,.f textarea,.fbar select,.fbar input,.pred select,.pred input,.pessoa input,.pessoa select{font-size:16px}
+  .fbar select,.fbar input{height:40px}
+  .demo-bar{font-size:12px;padding:6px 12px;line-height:1.5}
+  .demo-bar a{padding:4px 2px}
+  .crumbs a{padding:8px 0}
+  .crumbs{margin-bottom:2px}
+  .seg button{height:36px;padding:0 12px}
+  .btn.sm{height:36px}
+  .icon-act{width:38px;height:38px}
+  .check input{width:20px;height:20px}
+  /* abas do projeto: cabem todas, ícone em cima */
+  .ptabs{gap:0;margin-left:-14px;margin-right:-14px;padding:0 6px}
+  .ptabs a{flex:1;flex-direction:column;gap:3px;padding:10px 2px 9px;font-size:11px;min-width:64px;justify-content:center;text-align:center}
+  .ptabs a svg{width:19px;height:19px}
+  /* indicador de progresso ocupa a linha toda */
+  .kpi.ring-kpi{grid-column:1/-1;min-height:0}
+  .phero h1{font-size:1.9rem}
+  .phero .facts span:not(.badge){padding:5px 9px}
+  .gbar{flex-direction:column;align-items:stretch}
+  .gbar .acts{justify-content:space-between}
+  .gbar .acts .btn{flex:1}
+  .legend{gap:6px 12px}
+  /* Bagua */
+  .bgrid button{font-size:10px;line-height:1.2;padding:2px}
+  .bgrid button small{font-size:9px}
+  .planta svg.base text{display:none}
+  .compass{grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px)}
+  /* briefings: lista de perguntas fica no "abrir como cliente" */
+  .form-card .qs{display:none}
+  .form-card .acts .btn{flex:1}
+  /* modais: botões do rodapé com área de toque maior */
+  .m-f{padding:12px 14px calc(12px + env(safe-area-inset-bottom))}
+  .m-f .btn{height:44px}
+  .m-b{padding:16px}
+  .pred{grid-template-columns:1fr 84px 38px}
+  .totals{gap:14px}
+  .hello .btn{display:none}
+  .m-b .row2,.m-b .row3{grid-template-columns:1fr!important;gap:0}
+}
+
+/* ---------- cronograma em lista ---------- */
+.vis-seg button{display:inline-flex;align-items:center;gap:6px}
+.clist{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.cl-cat{padding:14px 16px 10px;background:var(--soft);border-bottom:1px solid var(--line)}
+.cl-act+.cl-cat{border-top:1px solid var(--line)}
+.cl-cat-h{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:14px}
+.cl-cat-h span{display:flex;align-items:center;gap:8px}
+.cl-cat-h i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.cl-cat>span{font-size:12px}
+.cl-act{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 16px;border-bottom:1px solid var(--line);box-shadow:inset 3px 0 0 var(--c);transition:background .2s}
+.cl-act:hover{background:var(--soft)}
+.cl-act.now{background:var(--mag-s)}
+.cl-main{flex:1;min-width:0}
+.cl-main b{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600}
+.cl-main b .dia{width:8px;height:8px;transform:rotate(45deg);background:#6B3FA0;flex-shrink:0}
+.cl-main>span{display:block;font-size:12px;color:var(--mut);margin-top:2px}
+.cl-side{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.clist>.hint{padding:12px 16px 14px;margin:0!important}
+@media (max-width:400px){ .cl-side .badge{display:none} .cl-act.now .cl-side .badge{display:inline-flex} }

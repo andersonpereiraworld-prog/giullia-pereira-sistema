@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Plus, Share2, Crosshair, Trash2, X, Copy, ExternalLink, Info } from 'lucide-react';
+import { Plus, Share2, Crosshair, Trash2, X, Copy, ExternalLink, Info, List, ChartGantt, ChevronRight } from 'lucide-react';
 import { update, projeto } from '../store';
 import { calcular, dependeDe, progresso, limites } from '../schedule';
 import { CATS } from '../data';
@@ -108,6 +108,7 @@ function Compartilhar({ p, onClose }) {
 
 export default function Cronograma({ p }) {
   const [esc, setEsc] = useState('semana');
+  const [vis, setVis] = useState(() => matchMedia('(max-width: 860px)').matches ? 'lista' : 'grafico');
   const [drag, setDrag] = useState(null);
   const [edit, setEdit] = useState(undefined);
   const [share, setShare] = useState(false);
@@ -152,7 +153,7 @@ export default function Cronograma({ p }) {
   }
 
   const irHoje = (suave = true) => scroller.current?.scrollTo({ left: Math.max(0, x(HOJE) - (scroller.current?.clientWidth || 600) * 0.35), behavior: suave ? 'smooth' : 'auto' });
-  useEffect(() => { irHoje(false); }, [esc]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (vis === 'grafico') irHoje(false); }, [esc, vis]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const segurar = (e, a, mode) => {
     if (e.pointerType === 'touch' || e.button !== 0) return;
@@ -195,14 +196,45 @@ export default function Cronograma({ p }) {
     <>
       <div className="gbar">
         <div className="acts">
-          <div className="seg">{[['dia', 'Dia'], ['semana', 'Semana'], ['mes', 'Mês']].map(([k, t]) => <button key={k} className={esc === k ? 'on' : ''} onClick={() => setEsc(k)}>{t}</button>)}</div>
-          <button className="btn sm" onClick={() => irHoje()}><Crosshair />Hoje</button>
+          <div className="seg vis-seg">
+            <button className={vis === 'lista' ? 'on' : ''} onClick={() => setVis('lista')}><List size={14} />Lista</button>
+            <button className={vis === 'grafico' ? 'on' : ''} onClick={() => setVis('grafico')}><ChartGantt size={14} />Gráfico</button>
+          </div>
+          {vis === 'grafico' && <>
+            <div className="seg">{[['dia', 'Dia'], ['semana', 'Semana'], ['mes', 'Mês']].map(([k, t]) => <button key={k} className={esc === k ? 'on' : ''} onClick={() => setEsc(k)}>{t}</button>)}</div>
+            <button className="btn sm" onClick={() => irHoje()}><Crosshair />Hoje</button>
+          </>}
         </div>
         <div className="acts">
           <button className={`btn sm ${p.portal ? 'on' : ''}`} onClick={() => setShare(true)}><Share2 />{p.portal ? 'Compartilhado' : 'Compartilhar com cliente'}</button>
           <button className="btn sm pri" onClick={() => setEdit(null)}><Plus />Nova atividade</button>
         </div>
       </div>
+      {vis === 'lista' ? (
+        <div className="clist">
+          {rows.map((rw, i) => rw.cat ? (
+            <div key={'c' + i} className="cl-cat">
+              <div className="cl-cat-h"><span><i style={{ background: rw.cat.cor }} />{rw.cat.nome}</span><b>{rw.pct}%</b></div>
+              <span className="mut">{fmtCurta(rw.ini)} → {fmtCurta(rw.fim)} · {rw.dur} dias</span>
+            </div>
+          ) : (() => {
+            const a = rw.a, ri = r[a.id];
+            const agora = ri.ini <= HOJE && ri.fim >= HOJE && a.pct < 100;
+            const st = a.pct >= 100 ? ['b-ok', 'Concluída'] : agora || a.pct > 0 ? ['b-mag', 'Em andamento'] : ri.fim < HOJE ? ['b-bad', 'Atrasada'] : ['b-mut', 'A fazer'];
+            return (
+              <button key={a.id} className={`cl-act${agora ? ' now' : ''}`} onClick={() => setEdit(a)} style={{ '--c': rw.cor }}>
+                <div className="cl-main">
+                  <b>{a.marco && <span className="dia" />}{a.nome}</b>
+                  <span>{a.marco ? fmtData(ri.ini) : `${fmtCurta(ri.ini)} → ${fmtCurta(ri.fim)} · ${a.dur} ${a.dur === 1 ? 'dia' : 'dias'}`} · {a.resp}</span>
+                  {!a.marco && <div className="progress" style={{ height: 5, marginTop: 8 }}><i style={{ width: a.pct + '%', background: rw.cor }} /></div>}
+                </div>
+                <div className="cl-side"><span className={`badge ${st[0]}`}>{st[1]}</span><ChevronRight size={16} color="var(--mut)" /></div>
+              </button>
+            );
+          })())}
+          <p className="hint" style={{ marginTop: 12, display: 'flex', gap: 6, alignItems: 'flex-start' }}><Info size={14} style={{ marginTop: 2 }} />Toque numa atividade pra mudar data, duração ou progresso. Tudo que depende dela se ajusta sozinho.</p>
+        </div>
+      ) : <>
       <div className="legend">
         {CATS.map(c => <span key={c.id}><i style={{ background: c.cor }} />{c.nome}</span>)}
         <span><i style={{ background: '#6B3FA0', transform: 'rotate(45deg)', borderRadius: 2 }} />Marco</span>
@@ -261,6 +293,7 @@ export default function Cronograma({ p }) {
         </div>
       </div>
       <p className="hint" style={{ marginTop: 10, display: 'flex', gap: 6, alignItems: 'center' }}><Info size={14} />No computador: arraste a barra pra mudar a data e puxe a ponta direita pra mudar a duração. Tudo que depende dela se ajusta sozinho. No celular, toque na atividade pra editar.</p>
+      </>}
 
       {edit !== undefined && <Atividade p={p} act={edit} onClose={() => setEdit(undefined)} />}
       {share && <Compartilhar p={p} onClose={() => setShare(false)} />}
